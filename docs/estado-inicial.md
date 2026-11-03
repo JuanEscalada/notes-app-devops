@@ -16,6 +16,12 @@ Comando:
 
 Resultado: 5 tests pasando
 
+- test_health: PASSED
+- test_create_and_list: PASSED
+- test_title_is_required: PASSED
+- test_get_and_delete: PASSED
+- test_invalid_id: PASSED
+
 Observaciones:
 - Los tests utilizan mongomock.
 - No requieren una instancia real de MongoDB.
@@ -32,8 +38,10 @@ Resultado: Exitoso
 
 Directorio de salida: dist/notes-web/
 
-## Limitaciones de la verificación
+## Pendiente de verificar
 
-- No se comprobó la conexión con MongoDB real.
-- No se comprobó el funcionamiento integrado con Docker Compose.
-- No se realizó un despliegue en Kubernetes.
+- Conexión real con MongoDB 8.0.
+- Autenticación en MongoDB.
+- Comunicación frontend/API.
+- Despliegue con Docker Compose.
+- Despliegue en Kubernetes.
