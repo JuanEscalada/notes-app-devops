@@ -16,7 +16,7 @@ services:
   api:
     image: notes-api:local
     environment:
-      MONGO_URI: mongodb://notes_app:notes_pass@db:27017/notes
+      MONGO_URI: "mongodb://notes_app:notes_pass@mongo:27017/notes?authSource=admin"
       PORT: "8000"
     depends_on:
       mongo:
