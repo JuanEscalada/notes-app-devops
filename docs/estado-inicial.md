@@ -30,7 +30,7 @@ Comandos:
 
 Resultado: Exitoso
 
-Directorio de salida: dist/
+Directorio de salida: dist/notes-web/
 
 ## Limitaciones de la verificación
 
