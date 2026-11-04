@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Desarrollo y tests
+tests/
+requirements-dev.txt
+
+# Archivos locales
+.env
+.env.*
+*.log
+
+# Git
+.git/
