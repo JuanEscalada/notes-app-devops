@@ -1,0 +1,58 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: notes-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notes-api
+  template:
+    metadata:
+      labels:
+        app: notes-api
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/juanescalada/notes-api@sha256:cc74371e04ebefd77d3855317b9519c4f5e5cc374a1e0dcd54f158515dcd3d4c
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: http
+              containerPort: 8000
+
+          env:
+            - name: MONGO_APP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: notes-db-credentials
+                  key: MONGO_APP_USERNAME
+
+            - name: MONGO_APP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: notes-db-credentials
+                  key: MONGO_APP_PASSWORD
+
+            - name: MONGO_URI
+              value: "mongodb://$(MONGO_APP_USERNAME):$(MONGO_APP_PASSWORD)@mongo:27017/notes?authSource=admin"
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+
