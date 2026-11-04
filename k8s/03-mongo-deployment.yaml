@@ -1,0 +1,92 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  namespace: notes-app
+spec:
+  replicas: 1
+
+  strategy:
+    type: Recreate
+
+  selector:
+    matchLabels:
+      app: mongo
+
+  template:
+    metadata:
+      labels:
+        app: mongo
+
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:8.0
+
+          ports:
+            - containerPort: 27017
+              name: mongodb
+
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: notes-db-credentials
+                  key: MONGO_ROOT_USERNAME
+
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: notes-db-credentials
+                  key: MONGO_ROOT_PASSWORD
+
+            - name: MONGO_APP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: notes-db-credentials
+                  key: MONGO_APP_USERNAME
+
+            - name: MONGO_APP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: notes-db-credentials
+                  key: MONGO_APP_PASSWORD
+
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+
+            - name: mongo-init
+              mountPath: /docker-entrypoint-initdb.d/init-mongo.js
+              subPath: init-mongo.js
+              readOnly: true
+
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -ec
+                - |
+                  mongosh --quiet \
+                    --host 127.0.0.1 \
+                    --username "$MONGO_APP_USERNAME" \
+                    --password "$MONGO_APP_PASSWORD" \
+                    --authenticationDatabase admin \
+                    notes \
+                    --eval 'if (db.runCommand({ping:1}).ok !== 1) quit(1)' \
+                    >/dev/null
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 12
+
+      volumes:
+        - name: mongo-data
+          persistentVolumeClaim:
+            claimName: mongo-data
+
+        - name: mongo-init
+          configMap:
+            name: mongo-init
+
