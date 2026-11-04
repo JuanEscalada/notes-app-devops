@@ -1,19 +1,53 @@
-#Para ejecutar:
+# Pruebas de integración
 
-./scripts/smoke-test.sh 
+Las pruebas verifican la comunicación entre Nginx, Flask y MongoDB, utilizando una base de datos real.
 
-y garantizando que todo funcione incluso bajando y levantando los servicios:
+## Requisitos
 
+- Bash, curl y Python 3.
+- Los tres servicios desplegados y disponibles.
+- Acceso HTTP a la aplicación.
+
+## Docker Compose
+
+Con la aplicación ejecutándose en `http://127.0.0.1:8080`:
+
+```bash
+./scripts/smoke-test.sh
+```
+
+Para comprobar también la persistencia después de eliminar y recrear los contenedores, sin eliminar los volúmenes:
+
+```bash
 ./scripts/smoke-test.sh --restart-compose
+```
 
-#Pruebas:
+Esta opción utiliza el proyecto Compose `notes-app-local`.
 
-- Crear y recuperar una nota
+## Kubernetes
 
-- Encontrarla en el listado
+Primero exponer temporalmente el Service:
 
-- Rechazar una nota inválida con HTTP 400
+```bash
+kubectl -n notes-app port-forward svc/proxy 18080:80
+```
 
-- Conservar la nota después de recrear los contenedores
+En otra terminal:
 
-- Eliminar la nota con HTTP 204 y verificar HTTP 404
+```bash
+BASE_URL=http://127.0.0.1:18080 ./scripts/smoke-test.sh
+```
+
+No utilizar `--restart-compose` para Kubernetes.
+
+## Comportamientos verificados
+
+- Crear una nota y recuperar su identificador.
+- Consultar la nota creada.
+- Comprobar que aparece en el listado.
+- Rechazar una nota sin título con HTTP 400.
+- Eliminar la nota con HTTP 204.
+- Confirmar que ya no existe mediante HTTP 404.
+- Opcionalmente, verificar persistencia después de recrear los contenedores Compose.
+
+Estas pruebas complementan los tests de pytest, que utilizan `mongomock` en lugar de MongoDB real.

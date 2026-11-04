@@ -38,6 +38,8 @@ cp .env.example .env
 
 Modificar `.env` para establecer las credenciales locales de MongoDB.
 
+Para las pruebas locales se recomienda generar contraseñas hexadecimales con openssl rand -hex 24. Esto evita caracteres que requieren codificación especial dentro de la URI de MongoDB. No se deben publicar las credenciales reales ni el archivo .env.
+
 Iniciar los servicios:
 
 ```bash

@@ -25,5 +25,8 @@
 ```bash
 cp .env.example .env
 # Cambiar passwords placeholder en .env antes de ejecutar
-docker compose -f diagnostics/compose.yaml up --build -d --wait
+docker compose --env-file .env \
+  -p notes-app-local \
+  -f diagnostics/compose.yaml \
+  up -d --build --wait
 ```
